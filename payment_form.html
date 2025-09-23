@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redirecting to eSewa...</title>
+</head>
+<body onload="document.forms[0].submit()">
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h3>Redirecting to eSewa Payment Gateway...</h3>
+        <p>Please wait while we redirect you to complete your payment.</p>
+    </div>
+    
+    <form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
+        <input type="hidden" name="amount" value="100" />
+        <input type="hidden" name="tax_amount" value="0" />
+        <input type="hidden" name="total_amount" value="100" />
+        <input type="hidden" name="transaction_uuid" value="order-12345" />
+        <input type="hidden" name="product_code" value="EPAYTEST" />
+        <input type="hidden" name="product_service_charge" value="0" />
+        <input type="hidden" name="product_delivery_charge" value="0" />
+        <input type="hidden" name="success_url" value="https://yoursite.com/success" />
+        <input type="hidden" name="failure_url" value="https://yoursite.com/failure" />
+        <input type="hidden" name="signed_field_names" value="total_amount,transaction_uuid,product_code" />
+        <input type="hidden" name="signature" value="SczXT9SBIbYuHL5fcAJhC6MxMAcj/Fj4BnvZ9+T0/Ko=" />
+        
+        <noscript>
+            <input type="submit" value="Continue to eSewa" />
+        </noscript>
+    </form>
+</body>
+</html>

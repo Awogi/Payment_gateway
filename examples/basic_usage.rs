@@ -1,35 +1,64 @@
-use esewa::{EsewaConfig, EsewaClient, PaymentRequest};
+use esewa::{Esewa, PaymentRequest};
 
-fn main() {
-    println!("=== eSewa Payment Gateway Demo ===\n");
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("=== eSewa Payment Gateway - Simple Integration ===\n");
 
-    // Create configuration
-    let config = EsewaConfig {
-        client_id: "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUBHwOBgAPEQ==".to_string(),
-        client_secret: "8gBm/:&EnhH.1/q".to_string(),
-        merchant_code: "EPAYTEST".to_string(),
-        sandbox: true,
-    };
+    // Initialize eSewa client with test credentials
+    let esewa = Esewa::new(
+        "EPAYTEST",                    // Test merchant code
+        "8gBm/:&EnhH.1/q",            // Test secret key
+        true                           // Sandbox mode
+    );
 
-    // Create client
-    let client = EsewaClient::new(config);
+    // Create a simple payment request
+    let payment = PaymentRequest::new(
+        100.0,                         // Amount: Rs. 100
+        "order-12345",                 // Unique transaction ID
+        "https://yoursite.com/success", // Success URL
+        "https://yoursite.com/failure"  // Failure URL
+    );
 
-    // Create a payment request
-    let payment_request = PaymentRequest {
-        product_id: "test-product-001".to_string(),
-        amount: 100.0,
-        success_url: "https://yoursite.com/success".to_string(),
-        failure_url: "https://yoursite.com/failure".to_string(),
-    };
+    println!("Payment Details:");
+    println!("Amount: Rs. {}", payment.amount);
+    println!("Transaction ID: {}", payment.transaction_uuid);
+    println!("Success URL: {}", payment.success_url);
+    println!("Failure URL: {}", payment.failure_url);
+    println!();
 
-    // Generate payment form
-    let form_html = client.build_payment_form(&payment_request);
+    // Generate payment form HTML
+    let form_html = esewa.create_payment_form(&payment)?;
 
-    println!("Generated Payment Form HTML:");
-    println!("{}", form_html);
+    // Save to file for testing
+    std::fs::write("payment_form.html", &form_html)?;
+    println!("✅ Payment form generated and saved to 'payment_form.html'");
+    println!("Open this file in a browser to test the payment flow.");
+    println!();
 
-    println!("\n=== Configuration Details ===");
-    println!("Base URL: {}", client.config.base_url());
-    println!("Merchant Code: {}", client.config.merchant_code);
-    println!("Is Sandbox: {}", client.config.sandbox);
+    // Example with detailed charges
+    println!("=== Payment with Detailed Charges ===");
+    let detailed_payment = PaymentRequest::with_charges(
+        100.0,  // Base amount
+        13.0,   // Tax (13% VAT)
+        5.0,    // Service charge
+        10.0,   // Delivery charge
+        "order-detailed-12346",
+        "https://yoursite.com/success",
+        "https://yoursite.com/failure"
+    );
+
+    println!("Detailed Payment:");
+    println!("Base Amount: Rs. {}", detailed_payment.amount);
+    println!("Tax: Rs. {}", detailed_payment.tax_amount);
+    println!("Service Charge: Rs. {}", detailed_payment.product_service_charge);
+    println!("Delivery Charge: Rs. {}", detailed_payment.product_delivery_charge);
+    println!("Total: Rs. {}", detailed_payment.total_amount);
+    println!();
+
+    println!("=== Test User Credentials ===");
+    println!("eSewa ID: 9806800001 (or 9806800002/3/4/5)");
+    println!("Password: Nepal@123");
+    println!("MPIN: 1122");
+    println!("Token: 123456");
+
+    Ok(())
 }
