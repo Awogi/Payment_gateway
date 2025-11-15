@@ -204,4 +204,20 @@ r#"<!DOCTYPE html>
         
         Ok(url)
     }
+
+    /// Helper to return the raw signature data string and the produced signature for a request.
+    /// Useful for debugging what is actually being signed and sent to eSewa.
+    pub fn signature_for_request(&self, request: &PaymentRequest) -> EsewaResult<(String, String)> {
+        let mut payment = request.clone();
+        payment.product_code = self.merchant_code.clone();
+
+        let signature_data = format!("{},{},{}",
+            payment.total_amount,
+            payment.transaction_uuid,
+            payment.product_code
+        );
+
+        let signature = self.generate_signature(&signature_data)?;
+        Ok((signature_data, signature))
+    }
 }
